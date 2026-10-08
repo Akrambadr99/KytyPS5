@@ -29,28 +29,35 @@ public:
 		using pointer           = const Range*;
 		using reference         = const Range&;
 
+		/// Start at the first set-bit range at or after start in bits.
 		Iterator(const BitArray& bits, size_t start)
 		    : m_bits(bits), m_range(bits.FirstRangeFrom(start)) {}
 
+		/// Advance to the next set-bit range and return this iterator.
 		Iterator& operator++() {
 			m_range = m_bits.FirstRangeFrom(m_range.second);
 			return *this;
 		}
 
+		/// Advance to the next set-bit range and return a copy of the previous position.
 		Iterator operator++(int) {
 			auto previous = *this;
 			++(*this);
 			return previous;
 		}
 
+		/// Compare both the underlying bit array and the current range.
 		[[nodiscard]] bool operator==(const Iterator& other) const {
 			return &m_bits == &other.m_bits && m_range == other.m_range;
 		}
 
+		/// Return whether the iterators refer to different arrays or ranges.
 		[[nodiscard]] bool operator!=(const Iterator& other) const { return !(*this == other); }
 
+		/// Return the current half-open set-bit range.
 		[[nodiscard]] reference operator*() const { return m_range; }
-		[[nodiscard]] pointer   operator->() const { return &m_range; }
+		/// Provide member access to the current half-open set-bit range.
+		[[nodiscard]] pointer operator->() const { return &m_range; }
 
 	private:
 		const BitArray& m_bits;

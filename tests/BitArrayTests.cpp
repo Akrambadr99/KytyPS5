@@ -12,6 +12,7 @@ using Bits = Common::BitArray<128>;
 
 static_assert(sizeof(Common::BitArray<1024>) == 128);
 
+/// Abort with a diagnostic if a test expectation is not satisfied.
 void Check(bool value, const char *message) {
   if (!value) {
     std::fprintf(stderr, "BitArrayTests: failed: %s\n", message);
@@ -19,6 +20,7 @@ void Check(bool value, const char *message) {
   }
 }
 
+/// Verify boundary bits, cross-word updates, and empty or invalid ranges.
 void TestPointAndRangeOperations() {
   Bits bits;
   Check(bits.None() && !bits.Any(), "default state is not empty");
@@ -55,6 +57,7 @@ void TestPointAndRangeOperations() {
   Check(bits.Get(7), "invalid or empty range modified the array");
 }
 
+/// Verify masked copies, XOR, and complement against expected bit values.
 void TestMaskedConstructionAndBitwiseOperations() {
   Bits source;
   source.Fill();
@@ -82,6 +85,7 @@ void TestMaskedConstructionAndBitwiseOperations() {
   }
 }
 
+/// Verify forward and backward range discovery and range-based iteration.
 void TestRangeDiscoveryAndIteration() {
   Bits bits;
   Check(bits.FirstRange() == Bits::Range{128, 128},
@@ -113,6 +117,7 @@ void TestRangeDiscoveryAndIteration() {
   Check(range_index == expected.size(), "range iterator omitted a run");
 }
 
+/// Compare randomized bit operations and range discovery with a boolean-array oracle.
 void TestRandomizedDifferential() {
   Bits bits;
   std::array<bool, 128> reference{};
@@ -246,6 +251,7 @@ void TestRandomizedDifferential() {
   }
 }
 
+/// Verify postfix results, independent iterator copies, and advancement to end().
 void TestPostfixIncrement() {
   Bits bits;
   bits.SetRange(3, 8);
@@ -275,6 +281,7 @@ void TestPostfixIncrement() {
         "postfix increment failed for a single full-array range");
 }
 
+/// Compare updates and iteration with an oracle at the memory tracker bit-array size.
 void TestTrackerSizedRandomizedDifferential() {
   using TrackerBits = Common::BitArray<1024>;
   TrackerBits bits;
@@ -328,6 +335,7 @@ void TestTrackerSizedRandomizedDifferential() {
 
 } // namespace
 
+/// Run all deterministic and randomized BitArray regression cases.
 int main() {
   TestPointAndRangeOperations();
   TestMaskedConstructionAndBitwiseOperations();
