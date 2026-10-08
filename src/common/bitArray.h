@@ -37,6 +37,12 @@ public:
 			return *this;
 		}
 
+		Iterator operator++(int) {
+			auto previous = *this;
+			++(*this);
+			return previous;
+		}
+
 		[[nodiscard]] bool operator==(const Iterator& other) const {
 			return &m_bits == &other.m_bits && m_range == other.m_range;
 		}

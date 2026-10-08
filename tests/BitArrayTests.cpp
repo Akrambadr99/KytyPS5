@@ -246,6 +246,35 @@ void TestRandomizedDifferential() {
   }
 }
 
+void TestPostfixIncrement() {
+  Bits bits;
+  bits.SetRange(3, 8);
+  bits.SetRange(63, 70);
+  bits.Set(127);
+
+  auto it = bits.begin();
+  const auto first = it++;
+  Check(*first == Bits::Range{3, 8},
+        "postfix increment did not return the previous range");
+  Check(*it == Bits::Range{63, 70},
+        "postfix increment did not advance to the cross-word range");
+  Check(*it++ == Bits::Range{63, 70},
+        "dereferencing postfix increment returned the wrong range");
+  Check(*it == Bits::Range{127, 128},
+        "postfix increment skipped the final bit");
+  Check(*first == Bits::Range{3, 8},
+        "advancing the iterator changed its saved copy");
+  const auto last = it++;
+  Check(*last == Bits::Range{127, 128} && it == bits.end(),
+        "postfix increment did not reach the end after the final range");
+
+  Bits full;
+  full.Fill();
+  auto full_it = full.begin();
+  Check(*full_it++ == Bits::Range{0, 128} && full_it == full.end(),
+        "postfix increment failed for a single full-array range");
+}
+
 void TestTrackerSizedRandomizedDifferential() {
   using TrackerBits = Common::BitArray<1024>;
   TrackerBits bits;
@@ -303,6 +332,7 @@ int main() {
   TestPointAndRangeOperations();
   TestMaskedConstructionAndBitwiseOperations();
   TestRangeDiscoveryAndIteration();
+  TestPostfixIncrement();
   TestRandomizedDifferential();
   TestTrackerSizedRandomizedDifferential();
   std::puts("BitArrayTests: all cases passed");
